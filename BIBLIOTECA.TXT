@@ -1,0 +1,69 @@
+; ----- MACROS -----  
+    CURSOR MACRO REN,COL,PAG
+       MOV AH,2
+       MOV DH,REN
+       MOV DL,COL
+       MOV BH,PAG
+       INT 10H 
+    CURSOR ENDM
+
+    IMPCAD_SINCOLOR MACRO CADENA
+       MOV AH,9
+       LEA DX,CADENA
+       INT 21H
+    IMPCAD_SINCOLOR ENDM 
+    
+    IMPCAD_COLOR MACRO CAD, LONG, REN, COL, PAG, MODO, COLOR
+        MOV AH, 19
+        LEA BP, CAD
+        MOV CX, LONG
+        MOV DH, REN
+        MOV DL, COL
+        MOV BH, PAG
+        MOV AL, MODO
+        MOV BL, COLOR
+        INT 10H
+    IMPCAD_COLOR ENDM
+    
+    LEER_CADENA MACRO CADENA
+        MOV AH, 10
+        LEA DX, CADENA
+        INT 21H
+    LEER_CADENA ENDM
+    
+    CREAR_ARCHIVO MACRO RUTA, TIPO
+        MOV AH, 3CH
+        LEA DX, RUTA
+        MOV CX, TIPO
+        INT 21H 
+    CREAR_ARCHIVO ENDM
+    
+    ABRIR_ARCHIVO MACRO RUTA, MODO
+        MOV AH, 3DH
+        LEA DX, RUTA
+        MOV AL, MODO ; 0-R, 1-W, 2-RW
+        INT 21H
+        
+        MOV ID, AX ; RECUPERAR ID
+    ABRIR_ARCHIVO ENDM
+    
+    ESCRIBIR_ARCHIVO MACRO CANT_ESCRIBIR, DATOS_ESCRIBIR, ID 
+        MOV AH, 40H
+        MOV CX, CANT_ESCRIBIR
+        LEA DX, DATOS_ESCRIBIR
+        MOV BX, ID
+        INT 21H    
+    ESCRIBIR_ARCHIVO ENDM
+
+    SCROLL_ARRIBA MACRO LINEAS, REN_SUP_IZQ, COL_SUP_IZQ, REN_INF_DER, COL_INF_DER, COLOR 
+        MOV AH, 6
+        MOV AL, LINEAS
+        MOV CH, REN_SUP_IZQ
+        MOV CL, COL_SUP_IZQ
+        MOV DH, REN_INF_DER
+        MOV DL, COL_INF_DER
+        MOV BH, COLOR
+        INT 10H    
+    SCROLL_ARRIBA ENDM 
+
+; ----- FIN MACROS -----  

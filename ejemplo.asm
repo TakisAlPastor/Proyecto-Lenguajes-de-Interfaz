@@ -1,0 +1,5 @@
+MOSTRAR_MENU PROC
+    ; CAD, LONG, REN, COL, PAG, MODO, COLOR
+    IMPCAD_COLOR msj, 17, 20, 10, 0, 0, 04FH 
+    RET
+ENDP              
