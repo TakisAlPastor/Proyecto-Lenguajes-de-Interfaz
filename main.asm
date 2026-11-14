@@ -14,11 +14,17 @@ INCLUDE BIBLIOTECA.TXT
     txtRepBase    DB 'FOLIO 01: Mejorar iluminacion en sala de lectura.', 0DH, 0AH
                   DB 'FOLIO 02: Agregar mas contactos electricos.', '$'
     txtAleBase    DB 'LOG 01: Sistema de buzon inicializado OK.', 0DH, 0AH, '$'
-    txtAleFuego   DB 'ALERTA CRITICA: Temperatura > 40C detectada en buzon!', 0DH, 0AH
-    txtAleRobot   DB 'ACCESO FISICO: Robot abrio compartimento de quejas.', 0DH, 0AH
+    txtAleFuego   DB 'ALERTA CRITICA: Temperatura > 40C detectada en buzon!', 0DH, 0AH, '$'
+    txtAleRobot   DB 'ACCESO FISICO: Robot abrio compartimento de quejas.', 0DH, 0AH, '$'
 
     ; --- Buffer de lectura ---
     bufferLectura DB 250 DUP('$')
+
+    ; --- Datos para Impresora y LED Display ---
+    mensajeImpresora DB 'REPORTE DE BUZON BIBLIOTECA ALAMEDA', 0DH, 0AH, 0
+    msjImpresora     DB 'Datos enviados a la impresora. Presiona una tecla...$'
+    numeroDisplay    DW 1234
+    msjDisplay       DB 0DH, 0AH, 'Numero enviado al LED Display. Presiona una tecla...$'
 
     ; --- Textos de la interfaz (FormaAlertas) ---
     titCabecera   DB ' PANEL DE PERSONAL - BUZON BIBLIOTECA ALAMEDA ' ; 46 chars
@@ -49,5 +55,6 @@ FIN:
     MOV AX, 4C00H
     INT 21H
 
-INCLUDE Impresora_Display   
+INCLUDE modulo3.asm
+INCLUDE Impresora_Display.asm
 END                
