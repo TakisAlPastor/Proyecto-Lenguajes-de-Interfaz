@@ -3,8 +3,6 @@ INCLUDE BIBLIOTECA.TXT
 .MODEL SMALL
 .STACK
 .DATA
-    msj     DB 'Mensaje de Prueba'
-
     ; --- Rutas de directorios y los 2 archivos de Carlos ---
     dirRaiz       DB 'C:\BUZON', 0
     dirCarlos     DB 'C:\BUZON\CARLOS', 0
@@ -43,7 +41,6 @@ INICIO:
     MOV ES, AX
 
 MAIN:
-    CALL MOSTRAR_MENU
     CALL MODULO_PERSONAL  
     CALL MODULO_IMPRESORA
     CALL MODULO_LED_DISPLAY
@@ -52,6 +49,5 @@ FIN:
     MOV AX, 4C00H
     INT 21H
 
-INCLUDE ejemplo.asm 
 INCLUDE Impresora_Display   
 END                
