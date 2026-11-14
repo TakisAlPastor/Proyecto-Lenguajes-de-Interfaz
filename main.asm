@@ -40,6 +40,38 @@ INCLUDE BIBLIOTECA.TXT
     msjTempAlta   DB 'PELIGRO (>40 C)! Alerta guardada en ALERTAS.TXT      $'
     msjErrorArch  DB 'Error al abrir o procesar el archivo en disco.       $'
 
+    ; --- Rutas de directorios y archivos del login ---
+    dirAlfredo       DB 'C:\BUZON\ALFREDO', 0
+    rutaUsuarios     DB 'C:\BUZON\ALFREDO\USUARIOS.TXT', 0
+    rutaAccesos      DB 'C:\BUZON\ALFREDO\ACCESOS.TXT', 0
+
+    txtUsuariosBase   DB 'alfredo:1234', 0DH, 0AH
+                      DB 'carlos:5678', 0DH, 0AH
+                      DB 'said:abcd', 0DH, 0AH ; 38 chars
+
+    txtEncabezadoAcc  DB '=== BITACORA DE ACCESOS ===', 0DH, 0AH ; 29 chars
+
+    prefijoUsuarioLog DB 'USUARIO: ' ; 9 chars
+    msjLogConcedido   DB ' -> ACCESO CONCEDIDO', 0DH, 0AH ; 22 chars
+    msjLogDenegado    DB ' -> ACCESO DENEGADO', 0DH, 0AH ; 21 chars
+
+    bufferUsuarios    DB 512 DUP(0)
+    entradaUsuario    DB 16, 0, 17 DUP(' ')
+    entradaClave      DB 16, 0, 17 DUP(' ')
+    longUsuario       DW 0
+    intentosRest      DB 3
+    digitoIntento     DB '0'
+    loginValido       DB 0
+    estadoAcceso      DB 0
+
+    titLogin          DB ' ACCESO DE PERSONAL - BUZON BIBLIOTECA         ' ; 47 chars
+    subtitLogin       DB ' Ingrese sus credenciales                      ' ; 47 chars
+    etqUsuario        DB 'Usuario:    ' ; 12 chars
+    etqClave          DB 'Contrasena: ' ; 12 chars
+    msjLoginOk        DB 'Acceso concedido. Presiona una tecla para continuar...   ' ; 57 chars
+    msjLoginError     DB 'Credenciales invalidas. Intentos restantes:              ' ; 57 chars
+    msjLoginBloq      DB 'Acceso denegado: 3 intentos fallidos. Cerrando sistema.  ' ; 57 chars
+
 .CODE
 INICIO:
     MOV AX, @DATA
@@ -47,6 +79,10 @@ INICIO:
     MOV ES, AX
 
 MAIN:
+    CALL MODULO_LOGIN
+    CMP loginValido, 1
+    JNE FIN
+    
     CALL MODULO_PERSONAL  
     CALL MODULO_IMPRESORA
     CALL MODULO_LED_DISPLAY
@@ -55,6 +91,7 @@ FIN:
     MOV AX, 4C00H
     INT 21H
 
+INCLUDE modulo1.asm
 INCLUDE modulo3.asm
 INCLUDE Impresora_Display.asm
 END                
