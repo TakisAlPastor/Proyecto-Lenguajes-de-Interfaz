@@ -44,11 +44,14 @@ INICIO:
 
 MAIN:
     CALL MOSTRAR_MENU
-    CALL MODULO_PERSONAL
+    CALL MODULO_PERSONAL  
+    CALL MODULO_IMPRESORA
+    CALL MODULO_LED_DISPLAY
 
 FIN:
     MOV AX, 4C00H
     INT 21H
 
-INCLUDE ejemplo.asm    
+INCLUDE ejemplo.asm 
+INCLUDE Impresora_Display   
 END                
