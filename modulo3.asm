@@ -62,21 +62,55 @@ ACCION_ROBOT:
 
 ACCION_TERMOMETRO:
     CALL LIMPIAR_VISOR
+    XOR AX, AX
     IN  AL, 125                 ; Puerto 125 (7Dh): Leer termometro de Emu8086
-    CMP AL, 40                  ; Verificar si supera los 40 grados Celsius
-    JGE ALERTA_INCENDIO
+    MOV tempActual, AL          ; Guardar lectura en C (0..255)
 
-    ; Temperatura segura (< 40 C)
+    ; Convertir grados Celsius a ASCII
+    LEA DI, msjLecturaTemp+16
+    CALL WORD_A_ASCII_3
+
+    ; Convertir Celsius a Fahrenheit: F = (C * 9) / 5 + 32
+    MOV AL, tempActual
+    MOV BL, 9
+    MUL BL                      ; AX = tempActual * 9
+    XOR DX, DX
+    MOV BX, 5
+    DIV BX                      ; AX = (tempActual * 9) / 5
+    ADD AX, 32                  ; AX = grados Fahrenheit
+    LEA DI, msjLecturaTemp+26
+    CALL WORD_A_ASCII_3
+
+    IMPCAD_COLOR msjLecturaTemp, 31, 13, 12, 0, 0, 0EH
+
+    MOV AL, tempActual
+    CMP AL, 40                  ; Verificar si alcanza o supera los 40 grados Celsius
+    JAE ALERTA_INCENDIO
+
+    ; Temperatura segura (< 40 C): calcular margen disponible = 40 - tempActual
     MOV AL, 0
     OUT 127, AL                 ; Puerto 127 (7Fh): Apagar calentador por seguridad
+    MOV AL, 40
+    SUB AL, tempActual
+    XOR AH, AH
+    LEA DI, msjMargenTemp+31
+    CALL WORD_A_ASCII_3
+
     IMPCAD_COLOR msjTempOk, 41, 15, 12, 0, 0, 02FH  ; Fondo verde
+    IMPCAD_COLOR msjMargenTemp, 36, 17, 12, 0, 0, 0AH
     RASTREO
     JMP CICLO_MENU_M3
 
 ALERTA_INCENDIO:
-    ; Apagar calentador y guardar incidente en ALERTAS.TXT
+    ; Apagar calentador, calcular exceso = tempActual - 40 y guardar incidente
     MOV AL, 0
     OUT 127, AL
+    MOV AL, tempActual
+    SUB AL, 40
+    XOR AH, AH
+    LEA DI, msjExcesoTemp+31
+    CALL WORD_A_ASCII_3
+
     CREAR_ARCHIVO rutaAlertas, 0
     JC  ERR_LECTURA_M3
     MOV ID, AX
@@ -84,6 +118,7 @@ ALERTA_INCENDIO:
     CERRAR_ARCHIVO ID
     ; Mostrar alerta roja parpadeante
     IMPCAD_COLOR msjTempAlta, 47, 15, 12, 0, 0, 04EH ; Fondo rojo, texto amarillo
+    IMPCAD_COLOR msjExcesoTemp, 36, 17, 12, 0, 0, 0CH
     RASTREO
     JMP CICLO_MENU_M3
 
@@ -149,23 +184,22 @@ INIT_ARCHIVOS_CARLOS PROC
     CREAR_DIRECTORIO dirRaiz
     CREAR_DIRECTORIO dirCarlos
 
-    ; Verificar si REP_01.TXT ya existe; si no, crearlo con datos base
-    ABRIR_ARCHIVO rutaReportes, 0
-    JNC CERRAR_REP_INIT
+    ; Crear REP_01.TXT con datos base (evita 21h/3Dh en Emu8086 si no existe)
     CREAR_ARCHIVO rutaReportes, 0
+    JC  CREAR_ALE_INIT_M3
     MOV ID, AX
     ESCRIBIR_ARCHIVO 95, txtRepBase, ID
-CERRAR_REP_INIT:
     CERRAR_ARCHIVO ID
 
-    ; Verificar si ALERTAS.TXT ya existe; si no, crearlo con datos base
-    ABRIR_ARCHIVO rutaAlertas, 0
-    JNC CERRAR_ALE_INIT
+CREAR_ALE_INIT_M3:
+    ; Crear ALERTAS.TXT con datos base
     CREAR_ARCHIVO rutaAlertas, 0
+    JC  FIN_INIT_CARLOS_M3
     MOV ID, AX
     ESCRIBIR_ARCHIVO 44, txtAleBase, ID
-CERRAR_ALE_INIT:
     CERRAR_ARCHIVO ID
+
+FIN_INIT_CARLOS_M3:
     RET
 INIT_ARCHIVOS_CARLOS ENDP
 
@@ -197,3 +231,32 @@ ESPERAR_ROBOT PROC
     JNZ ESPERAR_ROBOT
     RET
 ESPERAR_ROBOT ENDP
+
+; -----------------------------------------------------------------
+; PROCEDIMIENTO: Convierte AX (0..999) a 3 digitos ASCII en [DI..DI+2]
+; -----------------------------------------------------------------
+WORD_A_ASCII_3 PROC
+    PUSH AX
+    PUSH BX
+    PUSH CX
+    PUSH DX
+    PUSH DI
+
+    MOV BX, 10
+    ADD DI, 2                   ; Escribir de derecha a izquierda (unidades primero)
+    MOV CX, 3
+CONV_DIGITO_M3:
+    XOR DX, DX
+    DIV BX                      ; AX = cociente, DX = digito menos significativo
+    ADD DL, '0'
+    MOV [DI], DL
+    DEC DI
+    LOOP CONV_DIGITO_M3
+
+    POP DI
+    POP DX
+    POP CX
+    POP BX
+    POP AX
+    RET
+WORD_A_ASCII_3 ENDP

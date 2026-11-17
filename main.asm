@@ -39,6 +39,10 @@ INCLUDE BIBLIOTECA.TXT
     msjTempOk     DB 'Temperatura normal (<40 C). Buzon seguro.            $'
     msjTempAlta   DB 'PELIGRO (>40 C)! Alerta guardada en ALERTAS.TXT      $'
     msjErrorArch  DB 'Error al abrir o procesar el archivo en disco.       $'
+    tempActual     DB 0
+    msjLecturaTemp DB 'Lectura actual: 000 C  |  000 F'                    ; 31 chars (+16 C, +26 F)
+    msjMargenTemp  DB 'Margen antes de limite (40 C): 000 C'               ; 36 chars (+31)
+    msjExcesoTemp  DB 'Exceso sobre limite (40 C):    000 C'               ; 36 chars (+31)
 
     ; --- Rutas de directorios y archivos del login ---
     dirAlfredo       DB 'C:\BUZON\ALFREDO', 0
@@ -79,13 +83,13 @@ INICIO:
     MOV ES, AX
 
 MAIN:
-    CALL MODULO_LOGIN
-    CMP loginValido, 1
-    JNE FIN
+;    CALL MODULO_LOGIN
+;    CMP loginValido, 1
+;    JNE FIN
     
     CALL MODULO_PERSONAL  
-    CALL MODULO_IMPRESORA
-    CALL MODULO_LED_DISPLAY
+;    CALL MODULO_IMPRESORA
+;    CALL MODULO_LED_DISPLAY
 
 FIN:
     MOV AX, 4C00H
