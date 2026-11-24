@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2026/11/23 21:35:20.127,=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Unit1.pas</Transaction>
+    <Transaction>2026/11/23 21:36:20.792,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuella.pas=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Unit1.pas</Transaction>
+    <Transaction>2026/11/23 21:36:20.792,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuella.dfm=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Unit1.dfm</Transaction>
+    <Transaction>2026/11/23 21:36:38.421,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuellaProyecto.dproj=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Project1.dproj</Transaction>
+  </Transactions>
+</BorlandProject>
