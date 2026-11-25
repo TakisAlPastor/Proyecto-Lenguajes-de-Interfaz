@@ -91,4 +91,10 @@
         INT 16H
     RASTREO ENDM
 
+    IMP_CARACTER MACRO CAR
+        MOV AH, 02H
+        MOV DL, CAR
+        INT 21H
+    IMP_CARACTER ENDM
+
 ; ----- FIN MACROS -----  
