@@ -1,0 +1,267 @@
+; =================================================================
+; SAID - EMULATION KIT (ASCII LCD, Seven Segment, Dot Matrix)
+; Responsable: Ricardo Said Ramirez Cortez
+; Puertos Emulation Kit (C:\emu8086.io):
+;   - Dot Matrix:    2000h .. 2027h (40 bytes)
+;   - Seven Segment: 2030h .. 2037h (intentos restantes)
+;   - ASCII LCD:     2040h .. 206Fh (48 caracteres)
+; =================================================================
+
+PANEL_EMULATION_KIT_SAID PROC
+CICLO_KIT_M2:
+    CALL CLEAN_SCREEN
+    SCROLL_ARRIBA 0,  2, 14,  4, 65, 30H
+    SCROLL_ARRIBA 0,  6, 14, 16, 65, 70H
+    SCROLL_ARRIBA 0, 18, 14, 19, 65, 0EH
+
+    IMPCAD_COLOR titKitM2,   48,  3, 16, 0, 0, 30H
+    IMPCAD_COLOR opKit1M2,   48,  7, 16, 0, 0, 70H
+    IMPCAD_COLOR opKit2M2,   48,  8, 16, 0, 0, 70H
+    IMPCAD_COLOR opKit3M2,   48,  9, 16, 0, 0, 70H
+    IMPCAD_COLOR opKit4M2,   48, 10, 16, 0, 0, 70H
+    IMPCAD_COLOR opKit5M2,   48, 11, 16, 0, 0, 74H
+    IMPCAD_COLOR msjEligeOp, 48, 14, 16, 0, 0, 71H
+
+    CURSOR 14, 45, 0
+    RASTREO
+
+    CMP AL, '1'
+    JE PRUEBA_LCD_M2
+    CMP AL, '2'
+    JE PRUEBA_7SEG_M2
+    CMP AL, '3'
+    JE PRUEBA_MATRIZ_M2
+    CMP AL, '4'
+    JE PRUEBA_LEDDISP_M2
+    CMP AL, '5'
+    JE FIN_KIT_M2
+    JMP CICLO_KIT_M2
+
+PRUEBA_LCD_M2:
+    IMPCAD_COLOR msjDevLcdM2, 48, 18, 16, 0, 0, 1FH
+    CALL TECLA
+    MOV idMsgLcd, 4
+    CALL MOSTRAR_LCD_ESTADO
+    IMPCAD_COLOR msjKitOkM2, 48, 18, 16, 0, 0, 2FH
+    CALL TECLA
+    JMP CICLO_KIT_M2
+
+PRUEBA_7SEG_M2:
+    IMPCAD_COLOR msjDev7SegM2, 48, 18, 16, 0, 0, 1FH
+    CALL TECLA
+    CALL MOSTRAR_INTENTOS_7SEG
+    IMPCAD_COLOR msjKitOkM2, 48, 18, 16, 0, 0, 2FH
+    CALL TECLA
+    JMP CICLO_KIT_M2
+
+PRUEBA_MATRIZ_M2:
+    IMPCAD_COLOR msjDevMatOkM2, 48, 18, 16, 0, 0, 1FH
+    CALL TECLA
+    CALL MOSTRAR_DOT_MATRIX_OK
+
+    IMPCAD_COLOR msjDevMatErrM2, 48, 18, 16, 0, 0, 4FH
+    CALL TECLA
+    CALL MOSTRAR_DOT_MATRIX_ERROR
+
+    IMPCAD_COLOR msjKitOkM2, 48, 18, 16, 0, 0, 2FH
+    CALL TECLA
+    JMP CICLO_KIT_M2
+
+PRUEBA_LEDDISP_M2:
+    IMPCAD_COLOR msjDevLedDM2, 48, 18, 16, 0, 0, 1FH
+    CALL TECLA
+    MOV AH, 0
+    MOV AL, tempActual
+    MOV valorLedDisplay, AX
+    CALL ACTUALIZAR_LED_DISPLAY
+    IMPCAD_COLOR msjKitOkM2, 48, 18, 16, 0, 0, 2FH
+    CALL TECLA
+    JMP CICLO_KIT_M2
+
+FIN_KIT_M2:
+    RET
+PANEL_EMULATION_KIT_SAID ENDP
+
+; Limpia bufferLcd con espacios (16 bytes)
+LIMPIAR_BUFFER_LCD PROC
+    MOV CX, 16
+    MOV SI, 0
+CICLO_LIMP_LCD_M2:
+    MOV bufferLcd[SI], ' '
+    INC SI
+    LOOP CICLO_LIMP_LCD_M2
+    RET
+LIMPIAR_BUFFER_LCD ENDP
+
+; Envia texto corto de 16 bytes de bufferLcd a puertos 2040h..204Fh
+ENVIAR_BUFFER_LCD PROC
+    MOV DX, 2040H
+    MOV SI, 0
+    MOV CX, 16
+CICLO_ENV_LCD_M2:
+    MOV AL, bufferLcd[SI]
+    OUT DX, AL
+    INC SI
+    INC DX
+    LOOP CICLO_ENV_LCD_M2
+    RET
+ENVIAR_BUFFER_LCD ENDP
+
+; Muestra mensaje corto (16 chars) segun idMsgLcd (1=Den, 2=Emg, 4=Prueba)
+MOSTRAR_LCD_ESTADO PROC
+    MOV CX, 16
+    MOV SI, 0
+CICLO_MSG_LCD_M2:
+    CMP idMsgLcd, 1
+    JE LCD_SEL_DEN_M2
+    CMP idMsgLcd, 2
+    JE LCD_SEL_EMG_M2
+    MOV AL, txtLcdPrueba[SI]
+    JMP LCD_GUARDAR_CAR_M2
+LCD_SEL_DEN_M2:
+    MOV AL, txtLcdDenegado[SI]
+    JMP LCD_GUARDAR_CAR_M2
+LCD_SEL_EMG_M2:
+    MOV AL, txtLcdEmergencia[SI]
+LCD_GUARDAR_CAR_M2:
+    MOV bufferLcd[SI], AL
+    INC SI
+    LOOP CICLO_MSG_LCD_M2
+    CALL ENVIAR_BUFFER_LCD
+    RET
+MOSTRAR_LCD_ESTADO ENDP
+
+MOSTRAR_LCD_ACCESO_OK PROC
+    MOV CX, 16
+    MOV SI, 0
+COPIAR_PRE_LCD_M2:
+    MOV AL, txtLcdAcceso[SI]
+    MOV bufferLcd[SI], AL
+    INC SI
+    LOOP COPIAR_PRE_LCD_M2
+
+    MOV CX, 11
+    MOV SI, 5
+    MOV DI, 0
+COPIAR_USR_LCD_M2:
+    MOV AL, usuarioActivo[DI]
+    MOV bufferLcd[SI], AL
+    INC SI
+    INC DI
+    LOOP COPIAR_USR_LCD_M2
+
+    CALL ENVIAR_BUFFER_LCD
+    RET
+MOSTRAR_LCD_ACCESO_OK ENDP
+
+MOSTRAR_LCD_TEMP PROC
+    MOV CX, 16
+    MOV SI, 0
+    CMP tempActual, 40
+    JA LCD_TEMP_AL_M2
+
+COPIAR_LCDOK_M2:
+    MOV AL, txtLcdTempOk[SI]
+    MOV bufferLcd[SI], AL
+    INC SI
+    LOOP COPIAR_LCDOK_M2
+    JMP LCD_PONER_GRADOS_M2
+
+LCD_TEMP_AL_M2:
+    MOV AL, txtLcdTempAl[SI]
+    MOV bufferLcd[SI], AL
+    INC SI
+    LOOP LCD_TEMP_AL_M2
+
+LCD_PONER_GRADOS_M2:
+    MOV AL, tempAscii[0]
+    MOV bufferLcd[6], AL
+    MOV AL, tempAscii[1]
+    MOV bufferLcd[7], AL
+    MOV AL, tempAscii[2]
+    MOV bufferLcd[8], AL
+    CALL ENVIAR_BUFFER_LCD
+    RET
+MOSTRAR_LCD_TEMP ENDP
+
+; Muestra intentosRest (0..3) en Seven Segment (2030h..2037h)
+MOSTRAR_INTENTOS_7SEG PROC
+    MOV DX, 2030H
+    MOV AL, 00H
+    MOV CX, 8
+LIMP_INT_7SEG_M2:
+    OUT DX, AL
+    INC DX
+    LOOP LIMP_INT_7SEG_M2
+
+    MOV AL, intentosRest
+    CMP AL, 9
+    JBE DIG_VALIDO_7SEG_M2
+    MOV AL, 0
+DIG_VALIDO_7SEG_M2:
+    MOV AH, 0
+    MOV BX, AX
+    MOV AL, tabla7Seg[BX]
+    MOV DX, 2030H
+    OUT DX, AL
+    RET
+MOSTRAR_INTENTOS_7SEG ENDP
+
+MOSTRAR_DOT_MATRIX_OK PROC
+    MOV tipoPatronMatriz, 1
+    CALL ACTUALIZAR_DOT_MATRIX
+    RET
+MOSTRAR_DOT_MATRIX_OK ENDP
+
+MOSTRAR_DOT_MATRIX_ERROR PROC
+    MOV tipoPatronMatriz, 0
+    CALL ACTUALIZAR_DOT_MATRIX
+    RET
+MOSTRAR_DOT_MATRIX_ERROR ENDP
+
+LIMPIAR_DOT_MATRIX PROC
+    MOV DX, 2000H
+    MOV AL, 00H
+    MOV CX, 40
+CICLO_LIMP_MAT_M2:
+    OUT DX, AL
+    INC DX
+    LOOP CICLO_LIMP_MAT_M2
+    MOV indiceMatriz, 0
+    RET
+LIMPIAR_DOT_MATRIX ENDP
+
+ACTUALIZAR_DOT_MATRIX PROC
+    CMP indiceMatriz, 5
+    JB CALC_PUERTO_MAT_M2
+    CALL LIMPIAR_DOT_MATRIX
+
+CALC_PUERTO_MAT_M2:
+    MOV DX, 2000H
+    MOV CH, 0
+    MOV CL, indiceMatriz
+    CMP CX, 0
+    JE ESCRIBIR_8_MAT_M2
+AVANZAR_MAT_M2:
+    ADD DX, 8
+    LOOP AVANZAR_MAT_M2
+
+ESCRIBIR_8_MAT_M2:
+    MOV SI, 0
+    MOV CX, 8
+CICLO_MATRIZ_M2:
+    CMP tipoPatronMatriz, 1
+    JE USAR_OK_MAT_M2
+    MOV AL, patronMatrizErr[SI]
+    JMP ENV_MAT_M2
+USAR_OK_MAT_M2:
+    MOV AL, patronMatrizOK[SI]
+ENV_MAT_M2:
+    OUT DX, AL
+    INC SI
+    INC DX
+    LOOP CICLO_MATRIZ_M2
+
+    INC indiceMatriz
+    RET
+ACTUALIZAR_DOT_MATRIX ENDP

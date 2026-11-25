@@ -7,7 +7,6 @@
 ; =================================================================
 
 #start=Thermometer.exe#
-#start=Robot.exe#
 #start=Traffic_Lights.exe#
 #start=Stepper_motor.exe#
 #start=Printer.exe#
@@ -63,17 +62,22 @@ INCLUDE 'BIBLIOTECA.TXT'
     msjPendMod2     DB 'Modulo 2 (Said) en construccion - Parte 3       '
     msjMasVisor     DB 'Presiona una tecla para ver mas...              '
     msjErrorVis     DB 'Error al abrir o leer archivo. Presiona tecla.. '
+    titSubVisor     DB ' CONTENIDO DEL ARCHIVO:                         '
 
     ; --- Textos pantalla de Informacion del Sistema (48 chars c/u) ---
     msjInfoCab      DB '  INFORMACION DEL SISTEMA - MARCAHUELLA         '
     msjInfo1        DB 'Raiz:     C:\MARCAHUELLA                        '
     msjInfo2        DB 'Alfredo:  C:\MARCAHUELLA\ALFREDO                '
     msjInfo3        DB '  Files:  USUARIOS.TXT  |  ACCESOS.TXT          '
-    msjInfo4        DB '  Hw:     Robot, Traffic, Stepper, LEDs, Switch '
+    msjInfo4        DB '  Hw:     Traffic, Stepper, LEDs, Switches      '
     msjInfo5        DB 'Said:     C:\MARCAHUELLA\SAID                   '
     msjInfo6        DB '  Files:  ALERTAS.TXT   |  REPORTES.TXT         '
-    msjInfo7        DB '  Hw:     Thermo, Print, LED_D, LCD, 7Seg, Matr '
+    msjInfo7        DB '  Hw:     Thermo, Print(Rep), LED_D(T), LCD,7S,M'
     msjVolver       DB 'Presiona una tecla para regresar...             '
+    msjSalidaHw     DB 'Activando: Stepper(Cerrar), Traffic/LEDs(Off)...'
+
+    INCLUDE 'alfredo_datos.asm'
+    INCLUDE 'said_datos.asm'
 
 .CODE
 INICIO:
@@ -82,12 +86,12 @@ INICIO:
     MOV ES, AX
 
     CALL INIT_DIRECTORIOS_BASE
-    ; [Parte 2] CALL INIT_ARCHIVOS_ALFREDO
-    ; [Parte 3] CALL INIT_ARCHIVOS_SAID
+    CALL INIT_ARCHIVOS_ALFREDO
+    CALL INIT_ARCHIVOS_SAID
 
-    ; [Parte 2] CALL MODULO_LOGIN
-    ; [Parte 2] CMP loginValido, 1
-    ; [Parte 2] JNE FIN
+    CALL MODULO_LOGIN
+    CMP loginValido, 1
+    JNE FIN
 
 CICLO_MENU_PRINCIPAL:
     CALL DIBUJAR_MENU_PRINCIPAL
@@ -106,15 +110,11 @@ CICLO_MENU_PRINCIPAL:
     JMP CICLO_MENU_PRINCIPAL
 
 IR_MODULO_1:
-    ; [Parte 2] CALL MENU_ALFREDO
-    IMPCAD_COLOR msjPendMod1, 48, 18, 16, 0, 0, 4FH
-    CALL TECLA
+    CALL MENU_ALFREDO
     JMP CICLO_MENU_PRINCIPAL
 
 IR_MODULO_2:
-    ; [Parte 3] CALL MENU_SAID
-    IMPCAD_COLOR msjPendMod2, 48, 18, 16, 0, 0, 4FH
-    CALL TECLA
+    CALL MENU_SAID
     JMP CICLO_MENU_PRINCIPAL
 
 IR_INFO_SISTEMA:
@@ -122,6 +122,18 @@ IR_INFO_SISTEMA:
     JMP CICLO_MENU_PRINCIPAL
 
 FIN:
+    CMP loginValido, 1
+    JNE SALIDA_LIMPIA_FIN
+    IMPCAD_COLOR msjSalidaHw, 48, 18, 16, 0, 0, 1FH
+    CALL TECLA
+    CALL CERRAR_CERRADURA_STEPPER
+    MOV AX, 0000H               ; Apagar Traffic_Lights
+    OUT 4, AX
+    MOV DX, 2070H               ; Apagar LEDs Output
+    MOV AL, 00H
+    OUT DX, AL
+
+SALIDA_LIMPIA_FIN:
     SCROLL_ARRIBA 0, 0, 0, 24, 79, 07H
     CURSOR 0, 0, 0
     MOV AX, 4C00H
@@ -149,11 +161,9 @@ CLEAN_SCREEN PROC
     RET
 CLEAN_SCREEN ENDP
 
-; Crea C:\MARCAHUELLA y carpetas de equipo
+; Crea la carpeta raiz C:\MARCAHUELLA
 INIT_DIRECTORIOS_BASE PROC
     CREAR_DIRECTORIO dirRaiz
-    CREAR_DIRECTORIO dirAlfredo
-    CREAR_DIRECTORIO dirSaid
     RET
 INIT_DIRECTORIOS_BASE ENDP
 
@@ -275,6 +285,22 @@ PAUSA_SIG_PAGINA_VISOR PROC
     RET
 PAUSA_SIG_PAGINA_VISOR ENDP
 
-; [Parte 2] INCLUDE alfredo.asm
-; [Parte 3] INCLUDE said.asm
+; Dibuja la estructura comun del visor FormaAlertas
+DIBUJAR_MARCO_VISOR_COMUN PROC
+    CALL CLEAN_SCREEN
+    SCROLL_ARRIBA 0,  1,  4,  3, 75, 30H
+    SCROLL_ARRIBA 0,  5,  4,  9, 75, 70H
+    SCROLL_ARRIBA 0, 10,  4, 22, 75, 0EH
+
+    IMPCAD_COLOR msjVolver,   48,  7, 6, 0, 0, 71H
+    IMPCAD_COLOR titSubVisor, 48, 10, 6, 0, 0, 1FH
+    RET
+DIBUJAR_MARCO_VISOR_COMUN ENDP
+
+INCLUDE 'alfredo_login.asm'
+INCLUDE 'alfredo_archivos.asm'
+INCLUDE 'alfredo_dispositivos.asm'
+INCLUDE 'said_archivos.asm'
+INCLUDE 'said_emu_devices.asm'
+INCLUDE 'said_emulation_kit.asm'
 END INICIO
