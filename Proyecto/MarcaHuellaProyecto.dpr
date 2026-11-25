@@ -2,7 +2,7 @@ program MarcaHuellaProyecto;
 
 uses
   Vcl.Forms,
-  MarcaHuella in 'MarcaHuella.pas' {Form1};
+  FormaPrincipal in 'FormaPrincipal.pas' {Form1};
 
 {$R *.res}
 

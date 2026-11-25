@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
-  <Transactions>
-    <Transaction>2026/11/23 21:35:20.127,=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Unit1.pas</Transaction>
-    <Transaction>2026/11/23 21:36:20.792,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuella.pas=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Unit1.pas</Transaction>
-    <Transaction>2026/11/23 21:36:20.792,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuella.dfm=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Unit1.dfm</Transaction>
-    <Transaction>2026/11/23 21:36:38.421,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuellaProyecto.dproj=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Project1.dproj</Transaction>
+	<Transactions>
+    <Transaction>2026/11/23 21:35:20.000.127,=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Unit1.pas</Transaction>
+    <Transaction>2026/11/23 21:36:20.000.792,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Unit1.pas=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuella.pas</Transaction>
+    <Transaction>2026/11/23 21:36:20.000.792,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Unit1.dfm=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuella.dfm</Transaction>
+    <Transaction>2026/11/23 21:36:38.000.421,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Project1.dproj=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuellaProyecto.dproj</Transaction>
+    <Transaction>2026/11/23 21:37:35.000.502,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuella.pas=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\FormaPrincipal.pas</Transaction>
+    <Transaction>2026/11/23 21:37:35.000.502,C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\MarcaHuella.dfm=C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\FormaPrincipal.dfm</Transaction>
   </Transactions>
 </BorlandProject>
