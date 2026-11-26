@@ -60,8 +60,8 @@ object Form1: TForm1
     Color = clNavy
     ParentBackground = False
     TabOrder = 1
-    ExplicitWidth = 1098
-    ExplicitHeight = 582
+    ExplicitLeft = -8
+    ExplicitTop = 102
     object PanelLogin: TPanel
       Left = 64
       Top = 32
@@ -1801,8 +1801,8 @@ object Form1: TForm1
       end
       object imgAcercaDe: TImage
         AlignWithMargins = True
-        Left = -10
-        Top = -3
+        Left = -2
+        Top = 8
         Width = 209
         Height = 215
         AutoSize = True

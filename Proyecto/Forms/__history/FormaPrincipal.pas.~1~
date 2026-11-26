@@ -1,0 +1,183 @@
+unit FormaPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Imaging.jpeg, Vcl.Imaging.pngimage, Winapi.shellAPI;
+
+type
+  TForm1 = class(TForm)
+    PanelSuperior: TPanel;
+    LblTitulo: TLabel;
+    Label1: TLabel;
+    PanelContenido: TPanel;
+    PanelLogin: TPanel;
+    PanelDirectorios: TPanel;
+    PanelAlertas: TPanel;
+    PanelInfo: TPanel;
+    PanelDevices: TPanel;
+    PanelAcercaDe: TPanel;
+    btnSalir: TButton;
+    ImgLogin: TImage;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    imgAlertas: TImage;
+    imgDevices: TImage;
+    imgDirectorios: TImage;
+    imgInformacion: TImage;
+    imgAcercaDe: TImage;
+    procedure btnSalirClick(Sender: TObject);
+    procedure ImgLoginClick(Sender: TObject);
+    procedure imgAlertasClick(Sender: TObject);
+    procedure imgDevicesClick(Sender: TObject);
+    procedure imgInformacionClick(Sender: TObject);
+    procedure imgDirectoriosClick(Sender: TObject);
+    procedure imgAcercaDeClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+uses
+  FormaLogin, FormaAlertas, FormaAcercaDe, FormaDevices, FormaDirectorios,
+  FormaInformacion;
+{$R *.dfm}
+
+procedure TForm1.btnSalirClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TForm1.imgAcercaDeClick(Sender: TObject);
+var
+  Ventana: TFormAcercaDe;
+begin
+  Ventana := TFormAcercaDe.Create(Self);
+  try
+    Ventana.ShowModal;
+  finally
+    Ventana.Free;
+  end;
+end;
+
+procedure TForm1.imgDevicesClick(Sender: TObject);
+var
+  Ventana: TFormDevices;
+begin
+  Ventana := TFormDevices.Create(Self);
+  try
+    Ventana.ShowModal;
+  finally
+    Ventana.Free;
+  end;
+end;
+
+procedure TForm1.imgAlertasClick(Sender: TObject);
+var
+  Archivo: TStringList;
+  RutaAlertas: string;
+begin
+  RutaAlertas := 'C:\MARCAHUELLA\SAID\ALERTAS.TXT';
+
+  if not FileExists(RutaAlertas) then
+  begin
+    ShowMessage('No se encontró el archivo ALERTAS.TXT.');
+    Exit;
+  end;
+
+  Archivo := TStringList.Create;
+  try
+    Archivo.LoadFromFile(RutaAlertas);
+
+    if Archivo.Count = 0 then
+      ShowMessage('No hay alertas registradas.')
+    else
+      ShowMessage(Archivo.Text);
+  finally
+    Archivo.Free;
+  end;
+end;
+
+procedure TForm1.imgDirectoriosClick(Sender: TObject);
+var
+  Ventana: TFormDirectorios;
+begin
+  Ventana := TFormDirectorios.Create(Self);
+  try
+    Ventana.ShowModal;
+  finally
+    Ventana.Free;
+  end;
+end;
+
+procedure TForm1.imgInformacionClick(Sender: TObject);
+var
+  Ventana: TFormInformacion;
+begin
+  Ventana := TFormInformacion.Create(Self);
+  try
+    Ventana.ShowModal;
+  finally
+    Ventana.Free;
+  end;
+end;
+
+
+procedure TForm1.ImgLoginClick(Sender: TObject);
+var
+  RutaEmu: string;
+  RutaProyecto: string;
+  Resultado: HINST;
+begin
+  RutaEmu := 'C:\emu8086\emu8086.exe';
+  RutaProyecto := 'C:\Users\mg708\OneDrive\Documentos\Lenguajes de interfaz\Proyecto\emu\main.asm';
+
+  if FileExists(RutaEmu) and FileExists(RutaProyecto) then
+  begin
+    // Abre Emu8086 con el archivo principal
+    Resultado := ShellExecute(
+      Handle,
+      'open',
+      PChar(RutaEmu),
+      PChar('"' + RutaProyecto + '"'),
+      'C:\emu8086',
+      SW_SHOWNORMAL
+    );
+
+    if NativeInt(Resultado) <= 32 then
+    begin
+      ShowMessage('No se pudo iniciar Emu8086.');
+      Exit;
+    end;
+
+    // Espera a que Emu8086 cargue el archivo
+    Sleep(2000);
+
+    // Presionar F5 para abrir el emulador
+    keybd_event(VK_F5, 0, 0, 0);
+    keybd_event(VK_F5, 0, KEYEVENTF_KEYUP, 0);
+
+    // Esperar a que aparezca la ventana del emulador
+    Sleep(2500);
+
+    // Presionar F9 para ejecutar el programa
+    keybd_event(VK_F9, 0, 0, 0);
+    keybd_event(VK_F9, 0, KEYEVENTF_KEYUP, 0);
+  end
+  else
+    ShowMessage('No se encontró Emu8086 o main.asm.');
+end;
+
+
+
+end.

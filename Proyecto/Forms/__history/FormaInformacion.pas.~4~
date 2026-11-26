@@ -1,0 +1,88 @@
+﻿unit FormaInformacion;
+
+// Reproduce el trailer del proyecto (Trailer.mp4) dentro de la ventana
+// con TMediaPlayer, buscándolo en la misma carpeta del ejecutable (.exe).
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.MPlayer, System.IOUtils;
+
+type
+  TFormInformacion = class(TForm)
+    PanelSuperior: TPanel;
+    LblTitulo: TLabel;
+    LblSubtitulo: TLabel;
+    PanelFooter: TPanel;
+    MediaPlayer: TMediaPlayer;
+    BtnCerrar: TButton;
+    PanelCuerpo: TPanel;
+    PanelVideo: TPanel;
+    LblEstado: TLabel;
+    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    procedure MostrarEstado(const Texto: string);
+  public
+    { Public declarations }
+  end;
+
+var
+  FormInformacion: TFormInformacion;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFormInformacion.FormShow(Sender: TObject);
+var
+  Carpeta, Ruta: string;
+begin
+  LblEstado.Visible := False;
+
+  // Detecta automáticamente la ruta donde está el ejecutable (.exe)
+  Carpeta := ExtractFilePath(ParamStr(0));
+  Ruta := TPath.Combine(Carpeta, 'Trailer.mp4');
+
+  if not FileExists(Ruta) then
+  begin
+    MostrarEstado('No se encontró el video del trailer.' + sLineBreak +
+      sLineBreak + 'Se buscó en:' + sLineBreak + Carpeta +
+      sLineBreak + sLineBreak + 'Asegúrate de que el archivo se llame Trailer.mp4.');
+    Exit;
+  end;
+
+  try
+    MediaPlayer.DeviceType := dtAutoSelect; // Ayuda a reconocer formatos .mp4
+    MediaPlayer.FileName := Ruta;
+    MediaPlayer.Open;
+    MediaPlayer.Display := PanelVideo;
+    MediaPlayer.DisplayRect := PanelVideo.ClientRect;
+    MediaPlayer.Play;
+  except
+    on E: Exception do
+      MostrarEstado('No se pudo reproducir el video Trailer.mp4.' + sLineBreak +
+        sLineBreak + E.Message + sLineBreak + sLineBreak +
+        'Verifica que tengas los códecs instalados o convierte el video a .wmv / .avi.');
+  end;
+end;
+
+procedure TFormInformacion.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  try
+    MediaPlayer.Close;   // detiene el video y libera el archivo
+  except
+    // si no habia nada abierto, no pasa nada
+  end;
+end;
+
+procedure TFormInformacion.MostrarEstado(const Texto: string);
+begin
+  LblEstado.Caption := Texto;
+  LblEstado.Visible := True;
+end;
+
+end.

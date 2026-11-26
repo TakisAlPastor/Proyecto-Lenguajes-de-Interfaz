@@ -1,0 +1,203 @@
+﻿unit FormaAcercaDe;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, Winapi.ShellAPI, System.SysUtils,
+  System.Variants, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms,
+  Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
+
+type
+  TFormAcercaDe = class(TForm)
+    PanelSuperior: TPanel;
+    LblTitulo: TLabel;
+    LblSubtitulo: TLabel;
+    PanelTituloEquipo: TPanel;
+    LblEquipo: TLabel;
+    SbEquipo: TScrollBox;
+    PanelVideos: TPanel;
+    LblVideos: TLabel;
+    LblVideoAyuda: TLabel;
+    BtnTrailer: TButton;
+    BtnEntrevista: TButton;
+    PanelFooter: TPanel;
+    LblInstituto: TLabel;
+    BtnCerrar: TButton;
+    procedure FormCreate(Sender: TObject);
+    procedure BtnTrailerClick(Sender: TObject);
+    procedure BtnEntrevistaClick(Sender: TObject);
+  private
+    procedure CrearTarjeta(Indice: Integer; const Nombre, Rol, Correo: string);
+    procedure CorreoClick(Sender: TObject);
+    function BuscarVideo(const NombreBase: string): string;
+    procedure AbrirVideo(const NombreBase, Titulo: string);
+  public
+    { Public declarations }
+  end;
+
+var
+  FormAcercaDe: TFormAcercaDe;
+
+implementation
+
+{$R *.dfm}
+
+type
+  TIntegrante = record
+    Nombre: string;
+    Rol: string;
+    Correo: string;
+  end;
+
+const
+  // ---------------------------------------------------------------
+  // EDITA AQUI: nombres, roles y correos institucionales del equipo.
+  // Para agregar o quitar integrantes cambia el tamano del arreglo
+  // (array[0..N-1]) y la lista de abajo.
+  // ---------------------------------------------------------------
+  Integrantes: array[0..2] of TIntegrante = (
+    (Nombre: 'José Alfredo Camarena Martínez';
+     Rol: 'Módulo 1: Acceso y Seguridad';
+     Correo: 'CAMBIAR@tepic.tecnm.mx'),
+    (Nombre: 'Ricardo Said Ramírez Cortez';
+     Rol: 'Módulo 2: Alertas y Monitoreo';
+     Correo: 'CAMBIAR@tepic.tecnm.mx'),
+    (Nombre: 'NOMBRE DEL TERCER INTEGRANTE';
+     Rol: 'Rol / módulo';
+     Correo: 'CAMBIAR@tepic.tecnm.mx')
+  );
+
+  // Los videos se buscan como Trailer.* y Entrevista.* dentro de la
+  // carpeta "Videos" del proyecto (junto al .exe o hasta 3 niveles arriba).
+  NOMBRE_TRAILER    = 'Trailer';
+  NOMBRE_ENTREVISTA = 'Entrevista';
+
+procedure TFormAcercaDe.FormCreate(Sender: TObject);
+var
+  I: Integer;
+begin
+  for I := Low(Integrantes) to High(Integrantes) do
+    CrearTarjeta(I, Integrantes[I].Nombre, Integrantes[I].Rol,
+      Integrantes[I].Correo);
+end;
+
+procedure TFormAcercaDe.CrearTarjeta(Indice: Integer;
+  const Nombre, Rol, Correo: string);
+var
+  Tarjeta, Barra: TPanel;
+  LblNombre, LblRol, LblCorreo: TLabel;
+begin
+  Tarjeta := TPanel.Create(SbEquipo);
+  Tarjeta.Parent := SbEquipo;
+  Tarjeta.Top := Indice * 100;          // conserva el orden de la lista
+  Tarjeta.Height := 84;
+  Tarjeta.Align := alTop;
+  Tarjeta.AlignWithMargins := True;
+  Tarjeta.Margins.SetBounds(24, 8, 24, 0);
+  Tarjeta.BevelOuter := bvNone;
+  Tarjeta.ParentBackground := False;
+  Tarjeta.Color := 5061424;
+  Tarjeta.Caption := '';
+  Tarjeta.ShowCaption := False;
+
+  Barra := TPanel.Create(Tarjeta);
+  Barra.Parent := Tarjeta;
+  Barra.Align := alLeft;
+  Barra.Width := 6;
+  Barra.BevelOuter := bvNone;
+  Barra.ParentBackground := False;
+  Barra.Color := RGB(0, 168, 150);
+  Barra.Caption := '';
+  Barra.ShowCaption := False;
+
+  LblNombre := TLabel.Create(Tarjeta);
+  LblNombre.Parent := Tarjeta;
+  LblNombre.SetBounds(24, 10, 300, 22);
+  LblNombre.Caption := Nombre;
+  LblNombre.Font.Name := 'Segoe UI';
+  LblNombre.Font.Height := -17;
+  LblNombre.Font.Style := [fsBold];
+  LblNombre.Font.Color := clWhite;
+
+  LblRol := TLabel.Create(Tarjeta);
+  LblRol.Parent := Tarjeta;
+  LblRol.SetBounds(24, 36, 300, 18);
+  LblRol.Caption := Rol;
+  LblRol.Font.Name := 'Segoe UI';
+  LblRol.Font.Height := -13;
+  LblRol.Font.Color := RGB(170, 180, 200);
+
+  // Correo: etiqueta clicable (abre el cliente de correo con mailto:)
+  LblCorreo := TLabel.Create(Tarjeta);
+  LblCorreo.Parent := Tarjeta;
+  LblCorreo.SetBounds(24, 58, 300, 18);
+  LblCorreo.Caption := Correo;
+  LblCorreo.Font.Name := 'Segoe UI';
+  LblCorreo.Font.Height := -13;
+  LblCorreo.Font.Style := [fsUnderline];
+  LblCorreo.Font.Color := RGB(120, 190, 255);
+  LblCorreo.Cursor := crHandPoint;
+  LblCorreo.OnClick := CorreoClick;
+end;
+
+procedure TFormAcercaDe.CorreoClick(Sender: TObject);
+begin
+  ShellExecute(Handle, 'open',
+    PChar('mailto:' + TLabel(Sender).Caption), nil, nil, SW_SHOWNORMAL);
+end;
+
+function TFormAcercaDe.BuscarVideo(const NombreBase: string): string;
+const
+  Extensiones: array[0..5] of string =
+    ('.mp4', '.avi', '.wmv', '.mkv', '.mov', '.mpg');
+  Carpetas: array[0..4] of string =
+    ('Videos\', '..\Videos\', '..\..\Videos\', '..\..\..\Videos\', '');
+var
+  Base, Candidato: string;
+  I, J: Integer;
+begin
+  Result := '';
+  Base := ExtractFilePath(Application.ExeName);
+  for I := Low(Carpetas) to High(Carpetas) do
+    for J := Low(Extensiones) to High(Extensiones) do
+    begin
+      Candidato := ExpandFileName(Base + Carpetas[I] + NombreBase +
+        Extensiones[J]);
+      if FileExists(Candidato) then
+        Exit(Candidato);
+    end;
+end;
+
+procedure TFormAcercaDe.AbrirVideo(const NombreBase, Titulo: string);
+var
+  Ruta: string;
+  Resultado: HINST;
+begin
+  Ruta := BuscarVideo(NombreBase);
+  if Ruta = '' then
+  begin
+    MessageDlg('No se encontró el video "' + Titulo + '".' + sLineBreak +
+      sLineBreak + 'Colócalo en la carpeta Videos del proyecto con el ' +
+      'nombre ' + NombreBase + '.mp4 (también se aceptan .avi, .wmv, ' +
+      '.mkv, .mov y .mpg).', mtWarning, [mbOK], 0);
+    Exit;
+  end;
+
+  Resultado := ShellExecute(Handle, 'open', PChar(Ruta), nil, nil,
+    SW_SHOWNORMAL);
+  if NativeInt(Resultado) <= 32 then
+    ShowMessage('No se pudo abrir el video con el reproductor ' +
+      'predeterminado de Windows.');
+end;
+
+procedure TFormAcercaDe.BtnTrailerClick(Sender: TObject);
+begin
+  AbrirVideo(NOMBRE_TRAILER, 'Trailer del proyecto');
+end;
+
+procedure TFormAcercaDe.BtnEntrevistaClick(Sender: TObject);
+begin
+  AbrirVideo(NOMBRE_ENTREVISTA, 'Entrevista');
+end;
+
+end.

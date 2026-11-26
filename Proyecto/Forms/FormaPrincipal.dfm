@@ -77,12 +77,14 @@ object Form1: TForm1
       ParentBackground = False
       ParentFont = False
       TabOrder = 0
+      OnClick = ImgLoginClick
       object ImgLogin: TImage
         AlignWithMargins = True
         Left = 0
         Top = 0
         Width = 185
         Height = 193
+        Cursor = crHandPoint
         Center = True
         Picture.Data = {
           0A544A504547496D6167653F280000FFD8FFE000104A46494600010101006000
@@ -411,6 +413,7 @@ object Form1: TForm1
         Proportional = True
         Stretch = True
         Transparent = True
+        OnClick = ImgLoginClick
       end
     end
     object PanelDirectorios: TPanel
@@ -435,7 +438,7 @@ object Form1: TForm1
         Height = 30
         Caption = 'Directorios'
       end
-      object Image3: TImage
+      object imgDirectorios: TImage
         AlignWithMargins = True
         Left = -10
         Top = -3
@@ -788,6 +791,7 @@ object Form1: TForm1
         Proportional = True
         Stretch = True
         Transparent = True
+        OnClick = imgDirectoriosClick
       end
     end
     object PanelAlertas: TPanel
@@ -812,7 +816,7 @@ object Form1: TForm1
         Height = 30
         Caption = 'Alertas'
       end
-      object Image1: TImage
+      object imgAlertas: TImage
         AlignWithMargins = True
         Left = -5
         Top = 0
@@ -1123,6 +1127,7 @@ object Form1: TForm1
         Proportional = True
         Stretch = True
         Transparent = True
+        OnClick = imgAlertasClick
       end
     end
     object PanelInfo: TPanel
@@ -1147,7 +1152,7 @@ object Form1: TForm1
         Height = 30
         Caption = 'Informaci'#243'n'
       end
-      object Image4: TImage
+      object imgInformacion: TImage
         AlignWithMargins = True
         Left = -10
         Top = -3
@@ -1450,6 +1455,7 @@ object Form1: TForm1
         Proportional = True
         Stretch = True
         Transparent = True
+        OnClick = imgInformacionClick
       end
     end
     object PanelDevices: TPanel
@@ -1474,7 +1480,7 @@ object Form1: TForm1
         Height = 30
         Caption = 'Devices'
       end
-      object Image2: TImage
+      object imgDevices: TImage
         AlignWithMargins = True
         Left = -10
         Top = 0
@@ -1769,6 +1775,7 @@ object Form1: TForm1
         Proportional = True
         Stretch = True
         Transparent = True
+        OnClick = imgDevicesClick
       end
     end
     object PanelAcercaDe: TPanel
@@ -1793,7 +1800,7 @@ object Form1: TForm1
         Height = 30
         Caption = 'Acerca De'
       end
-      object Image5: TImage
+      object imgAcercaDe: TImage
         AlignWithMargins = True
         Left = -10
         Top = -3
@@ -2150,6 +2157,7 @@ object Form1: TForm1
         Proportional = True
         Stretch = True
         Transparent = True
+        OnClick = imgAcercaDeClick
       end
     end
     object btnSalir: TButton

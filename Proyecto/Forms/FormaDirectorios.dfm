@@ -1,14 +1,127 @@
 object FormDirectorios: TFormDirectorios
   Left = 0
   Top = 0
-  Caption = 'FormDirectorios'
-  ClientHeight = 461
-  ClientWidth = 684
-  Color = clBtnFace
+  BorderStyle = bsDialog
+  Caption = 'Directorios'
+  ClientHeight = 640
+  ClientWidth = 820
+  Color = 4335905
   Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
+  Font.Color = clWhite
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Position = poScreenCenter
+  OnCreate = FormCreate
   TextHeight = 15
+  object PanelSuperior: TPanel
+    Left = 0
+    Top = 0
+    Width = 820
+    Height = 80
+    Align = alTop
+    BevelOuter = bvNone
+    Color = 4791061
+    ParentBackground = False
+    TabOrder = 0
+    ExplicitWidth = 818
+    object LblTitulo: TLabel
+      Left = 24
+      Top = 6
+      Width = 166
+      Height = 45
+      Caption = 'Directorios'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -32
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+  end
+  object PanelFooter: TPanel
+    Left = 0
+    Top = 584
+    Width = 820
+    Height = 56
+    Align = alBottom
+    BevelOuter = bvNone
+    Color = 4791061
+    ParentBackground = False
+    TabOrder = 1
+    ExplicitTop = 576
+    ExplicitWidth = 818
+    object LblRuta: TLabel
+      Left = 24
+      Top = 20
+      Width = 470
+      Height = 15
+      AutoSize = False
+      EllipsisPosition = epPathEllipsis
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 13153450
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+    end
+    object BtnAbrir: TButton
+      Left = 506
+      Top = 10
+      Width = 170
+      Height = 36
+      Caption = 'Abrir en el Bloc de notas'
+      TabOrder = 0
+      OnClick = BtnAbrirClick
+    end
+    object BtnCerrar: TButton
+      Left = 686
+      Top = 10
+      Width = 110
+      Height = 36
+      Cancel = True
+      Caption = 'Cerrar'
+      Default = True
+      ModalResult = 2
+      TabOrder = 1
+    end
+  end
+  object PanelCuerpo: TPanel
+    Left = 0
+    Top = 80
+    Width = 820
+    Height = 504
+    Align = alClient
+    BevelOuter = bvNone
+    Color = 4335905
+    Padding.Left = 16
+    Padding.Top = 16
+    Padding.Right = 16
+    Padding.Bottom = 16
+    ParentBackground = False
+    TabOrder = 2
+    ExplicitWidth = 818
+    ExplicitHeight = 496
+    object MemoBiblioteca: TMemo
+      Left = 16
+      Top = 16
+      Width = 788
+      Height = 472
+      Align = alClient
+      BorderStyle = bsNone
+      Color = 4791061
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -14
+      Font.Name = 'Consolas'
+      Font.Style = []
+      ParentFont = False
+      ReadOnly = True
+      ScrollBars = ssBoth
+      TabOrder = 0
+      WordWrap = False
+      ExplicitWidth = 786
+      ExplicitHeight = 464
+    end
+  end
 end
