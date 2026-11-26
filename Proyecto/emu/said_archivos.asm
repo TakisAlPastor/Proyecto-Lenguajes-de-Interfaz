@@ -1,0 +1,233 @@
+; =================================================================
+; SAID - ARCHIVOS, FORMULARIO REPORTES Y VISORES FormaAlertas
+; Responsable: Ricardo Said Ramirez Cortez
+; Archivos:
+;   - C:\MARCAHUELLA\SAID\ALERTAS.TXT
+;   - C:\MARCAHUELLA\SAID\REPORTES.TXT
+; =================================================================
+
+; Crea C:\MARCAHUELLA\SAID y sus archivos iniciales solo la primera vez
+INIT_ARCHIVOS_SAID PROC
+    CREAR_DIRECTORIO dirSaid
+    JC FIN_INIT_SAID_M2
+
+    CREAR_ARCHIVO rutaAlertas, 0
+    JC VERIF_REP_INIT_M2
+    MOV ID, AX
+    ESCRIBIR_ARCHIVO 29, txtAleBase, ID
+    CERRAR_ARCHIVO ID
+
+VERIF_REP_INIT_M2:
+    CREAR_ARCHIVO rutaReportes, 0
+    JC FIN_INIT_SAID_M2
+    MOV ID, AX
+    ESCRIBIR_ARCHIVO 33, txtRepBase, ID
+    CERRAR_ARCHIVO ID
+
+FIN_INIT_SAID_M2:
+    RET
+INIT_ARCHIVOS_SAID ENDP
+
+MENU_SAID PROC
+CICLO_MENU_M2:
+    CALL CLEAN_SCREEN
+    SCROLL_ARRIBA 0,  2, 14,  4, 65, 30H
+    SCROLL_ARRIBA 0,  6, 14, 18, 65, 70H
+    SCROLL_ARRIBA 0, 20, 14, 21, 65, 0EH
+
+    IMPCAD_COLOR titMod2M2,     48,  3, 16, 0, 0, 30H
+    IMPCAD_COLOR opMod2_1,      48,  7, 16, 0, 0, 70H
+    IMPCAD_COLOR opMod2_2,      48,  8, 16, 0, 0, 70H
+    IMPCAD_COLOR opMod2_3,      48,  9, 16, 0, 0, 70H
+    IMPCAD_COLOR opMod2_4,      48, 10, 16, 0, 0, 70H
+    IMPCAD_COLOR opMod2_5,      48, 11, 16, 0, 0, 70H
+    IMPCAD_COLOR opMod2_6,      48, 12, 16, 0, 0, 70H
+    IMPCAD_COLOR opMod2_7,      48, 13, 16, 0, 0, 74H
+    IMPCAD_COLOR msjEligeOp7M2, 48, 16, 16, 0, 0, 71H
+
+    CURSOR 16, 45, 0
+    RASTREO
+
+    CMP AL, '1'
+    JE IR_FORM_REP_M2
+    CMP AL, '2'
+    JE IR_VER_ALE_M2
+    CMP AL, '3'
+    JE IR_VER_REP_M2
+    CMP AL, '4'
+    JE IR_TERMO_M2
+    CMP AL, '5'
+    JE IR_PRINT_M2
+    CMP AL, '6'
+    JE IR_KIT_M2
+    CMP AL, '7'
+    JE FIN_MENU_M2
+    JMP CICLO_MENU_M2
+
+IR_FORM_REP_M2:
+    CALL FORMULARIO_REPORTES
+    JMP CICLO_MENU_M2
+
+IR_VER_ALE_M2:
+    CALL VER_ALERTAS_ARCHIVO
+    JMP CICLO_MENU_M2
+
+IR_VER_REP_M2:
+    CALL VER_REPORTES_ARCHIVO
+    JMP CICLO_MENU_M2
+
+IR_TERMO_M2:
+    CALL ESCANEAR_TERMOMETRO
+    JMP CICLO_MENU_M2
+
+IR_PRINT_M2:
+    CALL IMPRIMIR_REPORTES_PRINTER
+    JMP CICLO_MENU_M2
+
+IR_KIT_M2:
+    CALL PANEL_EMULATION_KIT_SAID
+    JMP CICLO_MENU_M2
+
+FIN_MENU_M2:
+    RET
+MENU_SAID ENDP
+
+; Formulario de captura multiple en ciclo [S/N] para REPORTES.TXT
+FORMULARIO_REPORTES PROC
+CICLO_REP_M2:
+    CALL CLEAN_SCREEN
+    SCROLL_ARRIBA 0,  2, 14,  4, 65, 30H
+    SCROLL_ARRIBA 0,  6, 14, 17, 65, 70H
+    SCROLL_ARRIBA 0, 19, 14, 20, 65, 0EH
+
+    IMPCAD_COLOR titRepM2,    48,  3, 16, 0, 0, 30H
+    IMPCAD_COLOR etqFolioM2,  20,  8, 16, 0, 0, 70H
+    IMPCAD_COLOR barraFolioM2, 8,  8, 37, 0, 0, 0FH
+    IMPCAD_COLOR etqZonaM2,   20, 10, 16, 0, 0, 70H
+    IMPCAD_COLOR barraZonaM2, 12, 10, 37, 0, 0, 0FH
+    IMPCAD_COLOR etqDescM2,   20, 12, 16, 0, 0, 70H
+    IMPCAD_COLOR barraDescM2, 26, 12, 37, 0, 0, 0FH
+
+    CURSOR 8, 37, 0
+    LEER_CADENA entradaFolio
+    CURSOR 10, 37, 0
+    LEER_CADENA entradaZona
+    CURSOR 12, 37, 0
+    LEER_CADENA entradaDesc
+
+    CMP entradaFolio[1], 0
+    JE REP_DATO_INV_M2
+    CMP entradaZona[1], 0
+    JE REP_DATO_INV_M2
+    CMP entradaDesc[1], 0
+    JE REP_DATO_INV_M2
+
+    ABRIR_ARCHIVO rutaReportes, 2
+    JC REP_ERR_ARCH_M2
+    CALL POSICIONAR_FIN_ARCHIVO
+
+    ESCRIBIR_ARCHIVO 4, prefijoRepFol, ID
+    MOV AH, 0
+    MOV AL, entradaFolio[1]
+    MOV longEscribir, AX
+    ESCRIBIR_ARCHIVO longEscribir, entradaFolio+2, ID
+
+    ESCRIBIR_ARCHIVO 7, prefijoRepZon, ID
+    MOV AH, 0
+    MOV AL, entradaZona[1]
+    MOV longEscribir, AX
+    ESCRIBIR_ARCHIVO longEscribir, entradaZona+2, ID
+
+    ESCRIBIR_ARCHIVO 3, sepRepDesc, ID
+    MOV AH, 0
+    MOV AL, entradaDesc[1]
+    MOV longEscribir, AX
+    ESCRIBIR_ARCHIVO longEscribir, entradaDesc+2, ID
+
+    ESCRIBIR_ARCHIVO 2, saltoLineaM2, ID
+    CERRAR_ARCHIVO ID
+
+    INC totalReportes
+
+    IMPCAD_COLOR msjRepOkM2, 48, 19, 16, 0, 0, 2FH
+    JMP PREGUNTAR_OTRO_REP_M2
+
+REP_DATO_INV_M2:
+    IMPCAD_COLOR msjRepInvM2, 48, 19, 16, 0, 0, 4FH
+    JMP PREGUNTAR_OTRO_REP_M2
+
+REP_ERR_ARCH_M2:
+    IMPCAD_COLOR msjErrorVis, 48, 19, 16, 0, 0, 4FH
+
+PREGUNTAR_OTRO_REP_M2:
+    IMPCAD_COLOR msjOtroRepM2, 48, 15, 16, 0, 0, 71H
+    CURSOR 15, 52, 0
+    RASTREO
+    CMP AL, 'S'
+    JE CICLO_REP_M2
+    CMP AL, 's'
+    JE CICLO_REP_M2
+    RET
+FORMULARIO_REPORTES ENDP
+
+; Agrega alerta termica al final de ALERTAS.TXT (append)
+REGISTRAR_ALERTA_TERMICA PROC
+    ABRIR_ARCHIVO rutaAlertas, 2
+    JC FIN_REG_ALE_M2
+    CALL POSICIONAR_FIN_ARCHIVO
+    ESCRIBIR_ARCHIVO 23, prefijoAleTemp, ID
+    ESCRIBIR_ARCHIVO  3, tempAscii, ID
+    ESCRIBIR_ARCHIVO 11, sufijoAleTemp, ID
+    CERRAR_ARCHIVO ID
+FIN_REG_ALE_M2:
+    RET
+REGISTRAR_ALERTA_TERMICA ENDP
+
+; Agrega alerta por switch de emergencia (Bit 7) en ALERTAS.TXT
+REGISTRAR_ALERTA_EMERGENCIA PROC
+    ABRIR_ARCHIVO rutaAlertas, 2
+    JC FIN_REG_EMG_M2
+    CALL POSICIONAR_FIN_ARCHIVO
+    ESCRIBIR_ARCHIVO 43, txtAleEmergSw, ID
+    CERRAR_ARCHIVO ID
+FIN_REG_EMG_M2:
+    RET
+REGISTRAR_ALERTA_EMERGENCIA ENDP
+
+; Visor estilo FormaAlertas para ALERTAS.TXT
+VER_ALERTAS_ARCHIVO PROC
+    CALL DIBUJAR_MARCO_VISOR_COMUN
+    IMPCAD_COLOR titVisorAleM2, 48, 2, 16, 0, 0, 30H
+
+    ABRIR_ARCHIVO rutaAlertas, 0
+    JC ERR_VIS_ALE_M2
+    CALL MOSTRAR_ARCHIVO_VISOR
+    CERRAR_ARCHIVO ID
+    JMP ESP_VIS_ALE_M2
+
+ERR_VIS_ALE_M2:
+    IMPCAD_COLOR msjErrorVis, 48, 12, 6, 0, 0, 4FH
+
+ESP_VIS_ALE_M2:
+    CALL TECLA
+    RET
+VER_ALERTAS_ARCHIVO ENDP
+
+; Visor estilo FormaAlertas para REPORTES.TXT
+VER_REPORTES_ARCHIVO PROC
+    CALL DIBUJAR_MARCO_VISOR_COMUN
+    IMPCAD_COLOR titVisorRepM2, 48, 2, 16, 0, 0, 30H
+
+    ABRIR_ARCHIVO rutaReportes, 0
+    JC ERR_VIS_REP_M2
+    CALL MOSTRAR_ARCHIVO_VISOR
+    CERRAR_ARCHIVO ID
+    JMP ESP_VIS_REP_M2
+
+ERR_VIS_REP_M2:
+    IMPCAD_COLOR msjErrorVis, 48, 12, 6, 0, 0, 4FH
+
+ESP_VIS_REP_M2:
+    CALL TECLA
+    RET
+VER_REPORTES_ARCHIVO ENDP

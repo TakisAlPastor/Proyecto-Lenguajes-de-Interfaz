@@ -1,0 +1,131 @@
+unit FormaPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Imaging.jpeg, Vcl.Imaging.pngimage;
+
+type
+  TForm1 = class(TForm)
+    PanelSuperior: TPanel;
+    LblTitulo: TLabel;
+    Label1: TLabel;
+    PanelContenido: TPanel;
+    PanelLogin: TPanel;
+    PanelDirectorios: TPanel;
+    PanelAlertas: TPanel;
+    PanelInfo: TPanel;
+    PanelDevices: TPanel;
+    PanelAcercaDe: TPanel;
+    btnSalir: TButton;
+    ImgLogin: TImage;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    imgAlertas: TImage;
+    imgDevices: TImage;
+    imgDirectorios: TImage;
+    imgInformacion: TImage;
+    imgAcercaDe: TImage;
+    procedure btnSalirClick(Sender: TObject);
+    procedure ImgLoginClick(Sender: TObject);
+    procedure imgAlertasClick(Sender: TObject);
+    procedure imgDevicesClick(Sender: TObject);
+    procedure imgDirectoriosClick(Sender: TObject);
+    procedure imgInformacionClick(Sender: TObject);
+    procedure imgAcercaDeClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+uses
+  FormaLogin, FormaAlertas, FormaAcercaDe, FormaDevices, FormaDirectorios,
+  FormaInformacion;
+{$R *.dfm}
+
+procedure TForm1.btnSalirClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TForm1.imgAcercaDeClick(Sender: TObject);
+var
+  Ventana: TFormAcercaDe;
+begin
+  Ventana := TFormAcercaDe.Create(Self);
+  try
+    Ventana.ShowModal;
+  finally
+    Ventana.Free;
+  end;
+end;
+
+procedure TForm1.imgAlertasClick(Sender: TObject);
+var
+  Ventana: TFormAlertas;
+begin
+  Ventana := TFormAlertas.Create(Self);
+  try
+    Ventana.ShowModal;
+  finally
+    Ventana.Free;
+  end;
+end;
+
+procedure TForm1.imgDevicesClick(Sender: TObject);
+var
+  Ventana: TFormDevices;
+begin
+  Ventana := TFormDevices.Create(Self);
+  try
+    Ventana.ShowModal;
+  finally
+    Ventana.Free;
+  end;
+end;
+
+procedure TForm1.imgDirectoriosClick(Sender: TObject);
+var
+  Ventana: TFormDirectorios;
+begin
+  Ventana := TFormDirectorios.Create(Self);
+  try
+    Ventana.ShowModal;
+  finally
+    Ventana.Free;
+  end;
+end;
+
+procedure TForm1.imgInformacionClick(Sender: TObject);
+var
+  Ventana: TFormInformacion;
+begin
+  Ventana := TFormInformacion.Create(Self);
+  try
+    Ventana.ShowModal;
+  finally
+    Ventana.Free;
+  end;
+end;
+
+procedure TForm1.ImgLoginClick(Sender: TObject);
+var
+  VentanaLogin: TTFormLogin;
+begin
+  VentanaLogin := TTFormLogin.Create(Self);
+  try
+    VentanaLogin.ShowModal;
+  finally
+    VentanaLogin.Free;
+  end;
+end;
